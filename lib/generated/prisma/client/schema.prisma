@@ -1,0 +1,273 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String           @id @default(cuid())
+  email                String           @unique
+  name                 String?
+  role                 UserRole         @default(STUDENT)
+  skillLevel           String           @default("Beginner")
+  totalScore           Int              @default(0)
+  rank                 Int?
+  accuracy             Float            @default(0)
+  trend                String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  notificationsEnabled Boolean          @default(true)
+  reports              Report[]
+  simulations          Simulation[]
+  labInstances         LabInstance[]
+  progress             UserProgress[]
+  flagSubmissions      FlagSubmission[]
+
+  @@index([totalScore(sort: Desc)])
+  @@index([email])
+  @@index([role])
+}
+
+model Lab {
+  id             String             @id @default(cuid())
+  slug           String             @unique
+  title          String
+  description    String
+  category       String
+  difficulty     ScenarioDifficulty
+  timeEstimate   Int
+  skills         String[]
+  risk           String
+  dockerImage    String
+  flagHash       String
+  points         Int                @default(100)
+  accessType     LabAccessType
+  maxDurationMin Int                @default(60)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  instances LabInstance[]
+
+  @@index([category])
+  @@index([difficulty])
+}
+
+model LabInstance {
+  id             String            @id @default(cuid())
+  labId          String
+  userId         String
+  status         LabInstanceStatus @default(PROVISIONING)
+  externalId     String?
+  accessUrl      String?
+  startedAt      DateTime          @default(now())
+  expiresAt      DateTime
+  destroyedAt    DateTime?
+  score          Int               @default(0)
+  lastActivityAt DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  lab         Lab              @relation(fields: [labId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions FlagSubmission[]
+
+  @@index([userId])
+  @@index([labId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model FlagSubmission {
+  id            String   @id @default(cuid())
+  labInstanceId String
+  userId        String
+  submittedFlag String
+  isCorrect     Boolean
+  scoreAwarded  Int      @default(0)
+  submittedAt   DateTime @default(now())
+
+  labInstance LabInstance @relation(fields: [labInstanceId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([labInstanceId])
+  @@index([userId])
+}
+
+model Scenario {
+  id           String             @id @default(cuid())
+  title        String
+  description  String
+  category     ScenarioCategory
+  difficulty   ScenarioDifficulty
+  timeEstimate Int
+  skills       String[]
+  risk         String
+  targetSector String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  simulations  Simulation[]
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([category, difficulty])
+}
+
+model Simulation {
+  id           String           @id @default(cuid())
+  userId       String
+  scenarioId   String
+  status       SimulationStatus @default(NOT_STARTED)
+  currentStep  Int              @default(0)
+  score        Int?
+  timeTakenSec Int              @default(0)
+  riskReduced  Int              @default(0)
+  startedAt    DateTime         @default(now())
+  completedAt  DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  report       Report?
+  scenario     Scenario         @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  steps        SimulationStep[]
+
+  @@index([userId, status])
+  @@index([userId, startedAt(sort: Desc)])
+  @@index([scenarioId])
+  @@index([status])
+}
+
+model SimulationStep {
+  id             String     @id @default(cuid())
+  simulationId   String
+  stepNumber     Int
+  title          String
+  narrative      String
+  attackerGoal   String
+  options        String[]
+  correctOption  Int
+  selectedOption Int?
+  isCorrect      Boolean?
+  timeTakenSec   Int?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  simulation     Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+
+  @@unique([simulationId, stepNumber])
+  @@index([simulationId, stepNumber])
+}
+
+model Report {
+  id              String     @id @default(cuid())
+  simulationId    String     @unique
+  userId          String
+  score           Int
+  timeTakenSec    Int
+  correctActions  Int
+  totalActions    Int
+  riskReduced     Int
+  summary         String
+  strengths       String[]
+  areasToImprove  String[]
+  recommendations String[]
+  completedAt     DateTime   @default(now())
+  createdAt       DateTime   @default(now())
+  simulation      Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([simulationId])
+}
+
+model LearningTopic {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  level       LearningLevel
+  lessons     Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  progress    UserProgress[]
+
+  @@index([level])
+}
+
+model UserProgress {
+  id          String        @id @default(cuid())
+  userId      String
+  topicId     String
+  progress    Int           @default(0)
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  topic       LearningTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId])
+}
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum LabCategory {
+  WEB_ATTACKS
+  NETWORK_ATTACKS
+  APPLICATION_ATTACKS
+  PRIVILEGE_ESCALATION
+  GHANA_FOCUS
+  OTHER
+}
+
+enum LabAccessType {
+  WEB_TERMINAL
+  SSH
+  HTTP
+  GUI
+}
+
+enum LabInstanceStatus {
+  PENDING
+  PROVISIONING
+  READY
+  ACTIVE
+  COMPLETED
+  FAILED
+  EXPIRED
+  STOPPED
+}
+
+enum ScenarioDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ScenarioCategory {
+  SOCIAL_ENGINEERING
+  MALWARE
+  WEB_ATTACKS
+  NETWORK_ATTACKS
+  APPLICATION_ATTACKS
+  WIRELESS_ATTACKS
+  OTHER
+}
+
+enum SimulationStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum LearningLevel {
+  CORE
+  TECHNICAL
+  ADVANCED
+  GHANA_FOCUS
+}

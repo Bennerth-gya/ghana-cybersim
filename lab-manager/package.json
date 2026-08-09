@@ -1,0 +1,14 @@
+{
+  "name": "ghana-cybersim-lab-manager",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js"
+  },
+  "dependencies": {
+    "dockerode": "^5.0.1",
+    "express": "^4.22.2"
+  }
+}

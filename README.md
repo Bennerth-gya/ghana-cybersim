@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ghana CyberSim SQL Injection Lab
 
-## Getting Started
+This project now includes a complete HackTheBox-style SQL injection lab:
 
-First, run the development server:
+- `labs/sqli-momo/` — vulnerable Flask + SQLite target app
+- `lab-manager/` — Dockerode-based provisioning and signed reverse proxy service
+- `app/(app)/labs/` and `app/api/labs/` — Next.js lab UI and authenticated API integration
+
+## Build the Vulnerable Target
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker build -t ghana-cybersim/sqli-momo:latest labs/sqli-momo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The target exposes `/health`, `/lookup`, and `/api/lookup`. The vulnerable parameter is `phone`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run the Lab Manager
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cd lab-manager
+cp .env.example .env
+npm install
+npm start
+```
 
-## Learn More
+The manager creates a private internal Docker network per student instance, starts the target container with memory/CPU limits, and returns a signed `/lab-proxy/{instanceId}/{token}` URL.
 
-To learn more about Next.js, take a look at the following resources:
+## Configure Next.js
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Add these to `.env.local`:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+LAB_MANAGER_URL="http://localhost:4010"
+LAB_MANAGER_API_KEY="replace-with-a-shared-secret"
+```
 
-## Deploy on Vercel
+Then apply the Prisma schema and seed the lab:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run db:generate
+npx prisma db push
+npx tsx prisma/seed-labs.ts
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Student Flow
+
+1. Visit `/labs`
+2. Open `PesaLink Mobile Money SQL Injection`
+3. Click `Start Lab`
+4. Exploit the transaction lookup in the embedded target
+5. Submit the recovered `CYBERSIM{...}` flag
+6. Click `End Lab` when finished
+
+Instructor solution details are in `labs/sqli-momo/README.md`.

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NetCheck GH — Internet Diagnostic Portal</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          <span class="brand-logo">N</span>
+          <div>
+            <strong>NetCheck Ghana</strong>
+            <small>Internet Diagnostic Portal</small>
+          </div>
+        </div>
+        <div class="header-status">
+          <span class="pulse"></span>
+          <span>Network Operations Centre — Online</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <aside class="account-panel">
+        <div class="account-header">
+          <p class="eyebrow">Subscriber Info</p>
+          <h2>My Account</h2>
+        </div>
+        <dl class="account-details">
+          <dt>Customer</dt>
+          <dd>Kofi Mensah</dd>
+          <dt>Account No.</dt>
+          <dd>NCG-2024-08471</dd>
+          <dt>Plan</dt>
+          <dd>NetCheck Pro 50Mbps</dd>
+          <dt>Data Balance</dt>
+          <dd>12.4 GB remaining</dd>
+          <dt>Renewal</dt>
+          <dd>15 Aug 2026</dd>
+          <dt>Region</dt>
+          <dd>Greater Accra</dd>
+        </dl>
+        <div class="support-box">
+          <p class="support-label">Support</p>
+          <p>0800 NET CHECK</p>
+          <p class="support-sub">24/7 technical helpline</p>
+        </div>
+      </aside>
+
+      <section class="diagnostic-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Self-Service Tools</p>
+            <h1>Connection Diagnostic</h1>
+            <p class="lede">
+              Enter a hostname or IP address below to test connectivity from our
+              network gateway. Results are returned in real time.
+            </p>
+          </div>
+        </div>
+
+        <form action="/run-diagnostic" method="post" class="diagnostic-form">
+          <label for="host">Hostname or IP address</label>
+          <div class="input-row">
+            <input
+              id="host"
+              name="host"
+              type="text"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="e.g. 8.8.8.8 or google.com"
+              value="{{ host | e }}"
+              required
+            />
+            <button type="submit">Run Diagnostic</button>
+          </div>
+          <p class="input-hint">
+            Supported: IPv4 addresses and fully-qualified domain names (FQDN).
+          </p>
+        </form>
+
+        {% if error %}
+          <div class="result-box result-error">
+            <p class="result-title">Diagnostic Error</p>
+            <pre>{{ error }}</pre>
+          </div>
+        {% endif %}
+
+        {% if output is not none %}
+          <div class="result-box">
+            <div class="result-header">
+              <p class="result-title">Diagnostic Output</p>
+              <span class="result-badge">Live result</span>
+            </div>
+            <pre class="result-output">{{ output }}</pre>
+          </div>
+        {% endif %}
+
+        <div class="info-cards">
+          <div class="info-card">
+            <p class="info-card-title">Ping</p>
+            <p>Measures round-trip latency to a remote host using ICMP echo packets.</p>
+          </div>
+          <div class="info-card">
+            <p class="info-card-title">Packet Loss</p>
+            <p>High packet loss indicates congestion or a routing fault between you and the destination.</p>
+          </div>
+          <div class="info-card">
+            <p class="info-card-title">Latency</p>
+            <p>Expected latency to Ghanaian CDN nodes is 5–20 ms. International destinations average 80–140 ms.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2026 NetCheck Ghana Ltd. All rights reserved.</span>
+      <span>Reg. No. GH-NCA-2019-0041 · National Communications Authority Licensed</span>
+    </footer>
+  </body>
+</html>

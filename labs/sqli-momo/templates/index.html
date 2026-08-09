@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PesaLink Agent Portal</title>
+    <link rel="stylesheet" href="static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">PesaLink Ghana</p>
+          <h1>Agent Transaction Portal</h1>
+          <p class="lede">
+            Verify mobile money transfer status for customer support and branch reconciliation.
+          </p>
+        </div>
+        <div class="status-card">
+          <span class="pulse"></span>
+          <div>
+            <strong>Settlement network online</strong>
+            <small>Last sync: 08:00 GMT</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <aside class="login-panel">
+          <div class="brand-mark">P</div>
+          <h2>Agent Sign In</h2>
+          <p>Use your assigned terminal credentials to continue.</p>
+          <label>
+            Agent ID
+            <input value="agent-accra-014" disabled />
+          </label>
+          <label>
+            Password
+            <input value="********" type="password" disabled />
+          </label>
+          <button disabled>Sign in unavailable</button>
+        </aside>
+
+        <section class="lookup-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Customer support</p>
+              <h2>Check Transaction Status</h2>
+            </div>
+            <span>Live lookup</span>
+          </div>
+
+          <form action="lookup" method="get" class="lookup-form">
+            <label for="phone">Customer phone number</label>
+            <div>
+              <input
+                id="phone"
+                name="phone"
+                autocomplete="off"
+                placeholder="0245550101"
+                value="{{ phone_number }}"
+              />
+              <button type="submit">Search</button>
+            </div>
+          </form>
+
+          {% if error %}
+            <p class="error">{{ error }}</p>
+          {% endif %}
+
+          {% if rows is not none %}
+            <div class="results">
+              <div class="results-title">
+                <strong>Lookup results</strong>
+                <span>{{ rows|length }} records</span>
+              </div>
+
+              {% if rows %}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Reference</th>
+                      <th>Phone</th>
+                      <th>Recipient</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in rows %}
+                      <tr>
+                        <td>{{ row["reference"] }}</td>
+                        <td>{{ row["phone_number"] }}</td>
+                        <td>{{ row["recipient"] }}</td>
+                        <td>GHS {{ "%.2f"|format(row["amount"]|float) }}</td>
+                        <td><span class="badge">{{ row["status"] }}</span></td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% else %}
+                <p class="empty">No matching transaction records were found.</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
