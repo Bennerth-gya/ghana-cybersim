@@ -52,3 +52,4 @@ npx tsx prisma/seed-labs.ts
 6. Click `End Lab` when finished
 
 Instructor solution details are in `labs/sqli-momo/README.md`.
+# ghana-cybersim
