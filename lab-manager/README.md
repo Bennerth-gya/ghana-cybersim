@@ -8,6 +8,7 @@ From the project root:
 
 ```bash
 docker build -t ghana-cybersim/sqli-momo:latest labs/sqli-momo
+docker build -t ghana-cybersim/cmdi-netcheck:latest labs/cmdi-netcheck
 ```
 
 ## Run on an Ubuntu VPS
@@ -22,6 +23,17 @@ npm start
 ```
 
 The default service listens on `http://localhost:4010`.
+
+For production, expose the manager through HTTPS and set `PROXY_PUBLIC_BASE_URL`
+to that public origin. The Next.js app should use the same origin for
+`LAB_MANAGER_URL`, unless the Next.js server is running on the same VPS and can
+reach the manager through a private address.
+
+```bash
+PROXY_PUBLIC_BASE_URL=https://labs.example.com
+LAB_MANAGER_API_KEY=<same-secret-used-by-next>
+PROXY_TOKEN_SECRET=<long-random-secret>
+```
 
 For a containerized manager, run it with host networking so it can reach containers on per-instance internal Docker networks:
 

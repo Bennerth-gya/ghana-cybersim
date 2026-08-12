@@ -4,6 +4,8 @@ import { getOrCreateDbUser } from "@/lib/get-or-create-user";
 import { hexclaveServerApp } from "@/lib/hexclave/server";
 import { LabServiceError, startLabForUser } from "@/lib/lab-service";
 
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const hexUser = await hexclaveServerApp.getUser({ or: "return-null" });
