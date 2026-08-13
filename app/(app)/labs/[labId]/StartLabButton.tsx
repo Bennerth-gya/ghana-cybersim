@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { PlayCircle, Loader2, ArrowRight } from "lucide-react";
 
 export default function StartLabButton({ labId }: { labId: string }) {
   const router = useRouter();
@@ -37,17 +37,32 @@ export default function StartLabButton({ labId }: { labId: string }) {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2 sm:items-end">
+    <div className="flex flex-col items-start gap-2">
       <button
         type="button"
+        id="start-lab-btn"
         onClick={startLab}
         disabled={loading}
-        className="cyber-button-primary inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+        className="cyber-button-primary inline-flex items-center gap-2.5 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Starting..." : "Start Lab"}
-        <ArrowRight size={16} />
+        {loading ? (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            Provisioning container…
+          </>
+        ) : (
+          <>
+            <PlayCircle size={16} />
+            Start Lab
+            <ArrowRight size={14} className="opacity-70" />
+          </>
+        )}
       </button>
-      {error && <p className="max-w-64 text-sm text-red-400">{error}</p>}
+      {error && (
+        <p className="max-w-72 rounded-lg border border-[rgba(255,87,87,0.3)] bg-[rgba(255,87,87,0.08)] px-3 py-2 text-xs text-red-300">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

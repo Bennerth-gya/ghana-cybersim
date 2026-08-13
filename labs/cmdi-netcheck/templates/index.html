@@ -3,122 +3,253 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>NetCheck GH — Internet Diagnostic Portal</title>
+    <title>NetCheck GH - Internet Diagnostic Portal</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
     <header class="site-header">
       <div class="header-inner">
-        <div class="brand">
-          <span class="brand-logo">N</span>
-          <div>
+        <a class="brand" href="/" aria-label="NetCheck Ghana home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z" />
+              <path d="M8.25 12.4h7.5M8.25 9.4h7.5M8.25 15.4h4.1" />
+            </svg>
+          </span>
+          <span>
             <strong>NetCheck Ghana</strong>
-            <small>Internet Diagnostic Portal</small>
-          </div>
-        </div>
-        <div class="header-status">
-          <span class="pulse"></span>
-          <span>Network Operations Centre — Online</span>
+            <small>Subscriber diagnostic portal</small>
+          </span>
+        </a>
+
+        <div class="header-actions" aria-label="Network status">
+          <span class="status-pill status-pill-online">
+            <span class="pulse" aria-hidden="true"></span>
+            Operations online
+          </span>
+          <span class="status-pill">NCA licensed</span>
         </div>
       </div>
     </header>
 
-    <main class="shell">
-      <aside class="account-panel">
-        <div class="account-header">
-          <p class="eyebrow">Subscriber Info</p>
-          <h2>My Account</h2>
-        </div>
-        <dl class="account-details">
-          <dt>Customer</dt>
-          <dd>Kofi Mensah</dd>
-          <dt>Account No.</dt>
-          <dd>NCG-2024-08471</dd>
-          <dt>Plan</dt>
-          <dd>NetCheck Pro 50Mbps</dd>
-          <dt>Data Balance</dt>
-          <dd>12.4 GB remaining</dd>
-          <dt>Renewal</dt>
-          <dd>15 Aug 2026</dd>
-          <dt>Region</dt>
-          <dd>Greater Accra</dd>
-        </dl>
-        <div class="support-box">
-          <p class="support-label">Support</p>
-          <p>0800 NET CHECK</p>
-          <p class="support-sub">24/7 technical helpline</p>
-        </div>
-      </aside>
-
-      <section class="diagnostic-panel">
-        <div class="panel-header">
-          <div>
-            <p class="eyebrow">Self-Service Tools</p>
-            <h1>Connection Diagnostic</h1>
-            <p class="lede">
-              Enter a hostname or IP address below to test connectivity from our
-              network gateway. Results are returned in real time.
-            </p>
-          </div>
-        </div>
-
-        <form action="/run-diagnostic" method="post" class="diagnostic-form">
-          <label for="host">Hostname or IP address</label>
-          <div class="input-row">
-            <input
-              id="host"
-              name="host"
-              type="text"
-              autocomplete="off"
-              autocorrect="off"
-              spellcheck="false"
-              placeholder="e.g. 8.8.8.8 or google.com"
-              value="{{ host | e }}"
-              required
-            />
-            <button type="submit">Run Diagnostic</button>
-          </div>
-          <p class="input-hint">
-            Supported: IPv4 addresses and fully-qualified domain names (FQDN).
+    <main class="page-shell">
+      <section class="overview-band" aria-labelledby="overview-title">
+        <div class="overview-copy">
+          <p class="eyebrow">Accra East Gateway</p>
+          <h1 id="overview-title">Connection Diagnostic</h1>
+          <p>
+            Run a gateway-side connectivity check for a hostname or IP address
+            and review the response from the NetCheck operations network.
           </p>
-        </form>
+        </div>
 
-        {% if error %}
-          <div class="result-box result-error">
-            <p class="result-title">Diagnostic Error</p>
-            <pre>{{ error }}</pre>
+        <div class="status-grid" aria-label="Service summary">
+          <div class="metric-card metric-card-good">
+            <span class="metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </span>
+            <span class="metric-label">Gateway</span>
+            <strong>Healthy</strong>
           </div>
-        {% endif %}
-
-        {% if output is not none %}
-          <div class="result-box">
-            <div class="result-header">
-              <p class="result-title">Diagnostic Output</p>
-              <span class="result-badge">Live result</span>
-            </div>
-            <pre class="result-output">{{ output }}</pre>
+          <div class="metric-card">
+            <span class="metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 20v-6M6.5 16.5a8 8 0 0 1 11 0M3 12.5a13 13 0 0 1 18 0" />
+              </svg>
+            </span>
+            <span class="metric-label">Plan</span>
+            <strong>50 Mbps</strong>
           </div>
-        {% endif %}
-
-        <div class="info-cards">
-          <div class="info-card">
-            <p class="info-card-title">Ping</p>
-            <p>Measures round-trip latency to a remote host using ICMP echo packets.</p>
-          </div>
-          <div class="info-card">
-            <p class="info-card-title">Packet Loss</p>
-            <p>High packet loss indicates congestion or a routing fault between you and the destination.</p>
-          </div>
-          <div class="info-card">
-            <p class="info-card-title">Latency</p>
-            <p>Expected latency to Ghanaian CDN nodes is 5–20 ms. International destinations average 80–140 ms.</p>
+          <div class="metric-card metric-card-warn">
+            <span class="metric-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 6v6l4 2" />
+                <circle cx="12" cy="12" r="9" />
+              </svg>
+            </span>
+            <span class="metric-label">Renewal</span>
+            <strong>15 Aug</strong>
           </div>
         </div>
       </section>
+
+      <div class="content-grid">
+        <aside class="sidebar" aria-label="Subscriber account">
+          <section class="panel account-panel">
+            <div class="panel-heading">
+              <p class="eyebrow">Subscriber</p>
+              <h2>Kofi Mensah</h2>
+            </div>
+
+            <dl class="account-details">
+              <div>
+                <dt>Account No.</dt>
+                <dd>NCG-2024-08471</dd>
+              </div>
+              <div>
+                <dt>Region</dt>
+                <dd>Greater Accra</dd>
+              </div>
+              <div>
+                <dt>Service Plan</dt>
+                <dd>NetCheck Pro 50Mbps</dd>
+              </div>
+              <div>
+                <dt>Data Balance</dt>
+                <dd>12.4 GB remaining</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="panel support-panel" aria-labelledby="support-title">
+            <span class="support-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 12a7 7 0 0 1 14 0v4a2 2 0 0 1-2 2h-2" />
+                <path d="M8 11v4H6a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2h2Z" />
+                <path d="M16 11v4h2a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2h-2Z" />
+                <path d="M13 18h2" />
+              </svg>
+            </span>
+            <div>
+              <p class="eyebrow">Support Desk</p>
+              <h2 id="support-title">0800 NET CHECK</h2>
+              <p>24/7 technical helpline</p>
+            </div>
+          </section>
+        </aside>
+
+        <section class="workspace">
+          <section class="panel diagnostic-panel" aria-labelledby="diagnostic-title">
+            <div class="panel-heading diagnostic-heading">
+              <div>
+                <p class="eyebrow">Self-service tool</p>
+                <h2 id="diagnostic-title">Run Diagnostic</h2>
+              </div>
+              <span class="service-chip">ICMP check</span>
+            </div>
+
+            <form action="/run-diagnostic" method="post" class="diagnostic-form">
+              <label for="host">Hostname or IP address</label>
+              <div class="input-row">
+                <div class="input-wrap">
+                  <span class="input-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                      <path d="M4 12h16" />
+                      <path d="M12 4v16" />
+                      <path d="M5 5l14 14" />
+                      <path d="M19 5 5 19" />
+                    </svg>
+                  </span>
+                  <input
+                    id="host"
+                    name="host"
+                    type="text"
+                    autocomplete="off"
+                    autocorrect="off"
+                    spellcheck="false"
+                    placeholder="127.0.0.1 or example.com"
+                    value="{{ host | e }}"
+                    required
+                  />
+                </div>
+                <button type="submit">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M5 12h13" />
+                    <path d="m13 6 6 6-6 6" />
+                  </svg>
+                  Run
+                </button>
+              </div>
+              <div class="quick-targets" aria-label="Quick targets">
+                <span>Quick targets</span>
+                <a href="/run-diagnostic?host=127.0.0.1">127.0.0.1</a>
+                <a href="/run-diagnostic?host=localhost">localhost</a>
+                <a href="/run-diagnostic?host=gateway.netcheck.local">gateway.netcheck.local</a>
+              </div>
+            </form>
+          </section>
+
+          {% if error %}
+            <section class="panel result-panel result-error" aria-live="polite">
+              <div class="result-header">
+                <div>
+                  <p class="eyebrow">Diagnostic error</p>
+                  <h2>Request could not complete</h2>
+                </div>
+                <span class="result-badge result-badge-error">Error</span>
+              </div>
+              <pre>{{ error }}</pre>
+            </section>
+          {% endif %}
+
+          {% if output is not none %}
+            <section class="panel result-panel" aria-live="polite">
+              <div class="result-header">
+                <div>
+                  <p class="eyebrow">Diagnostic output</p>
+                  <h2>{{ host | e }}</h2>
+                </div>
+                <span class="result-badge">Live result</span>
+              </div>
+              <pre class="result-output">{{ output }}</pre>
+            </section>
+          {% else %}
+            <section class="empty-state" aria-label="No diagnostic result yet">
+              <span class="empty-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M4 17h16" />
+                  <path d="M7 17V9l5-4 5 4v8" />
+                  <path d="M10 17v-5h4v5" />
+                </svg>
+              </span>
+              <div>
+                <h2>Ready for a gateway check</h2>
+                <p>Your diagnostic output will appear here after a request completes.</p>
+              </div>
+            </section>
+          {% endif %}
+
+          <section class="insight-grid" aria-label="Diagnostic guide">
+            <article class="insight-card">
+              <span class="insight-icon insight-icon-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M4 12h3l2-5 4 10 2-5h5" />
+                </svg>
+              </span>
+              <h3>Latency</h3>
+              <p>Local CDN responses usually sit below 20 ms during normal service.</p>
+            </article>
+            <article class="insight-card">
+              <span class="insight-icon insight-icon-gold" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 2v20" />
+                  <path d="M5 7h14" />
+                  <path d="M7 17h10" />
+                </svg>
+              </span>
+              <h3>Packet Loss</h3>
+              <p>Loss above 2 percent can indicate congestion or an upstream routing fault.</p>
+            </article>
+            <article class="insight-card">
+              <span class="insight-icon insight-icon-red" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 9v4" />
+                  <path d="M12 17h.01" />
+                  <path d="M10.3 3.9 2.9 18a2 2 0 0 0 1.8 3h14.6a2 2 0 0 0 1.8-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+                </svg>
+              </span>
+              <h3>Timeouts</h3>
+              <p>Repeated timeouts often point to DNS, firewall, or reachability issues.</p>
+            </article>
+          </section>
+        </section>
+      </div>
     </main>
 
     <footer class="site-footer">
-      <span>© 2026 NetCheck Ghana Ltd. All rights reserved.</span>
+      <span>© 2026 NetCheck Ghana Ltd.</span>
       <span>Reg. No. GH-NCA-2019-0041 · National Communications Authority Licensed</span>
     </footer>
   </body>
